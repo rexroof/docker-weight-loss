@@ -84,10 +84,11 @@ One useful tool for analyzing wasted space in your docker containers is [dive](h
 I'm Rex Roof.   I live in Ann Arbor,  Michigan, USA and work on infrastructure at Blue Newt Software. You can find me at most internet places with the name `rexroof`.
 
 Links to slides for when I gave this talk at Devops Days Guadalajara
-<>\
+<https://docs.google.com/presentation/d/1rHhL_tT7umwVMQTod9FOJZWJaIZZn0JUz7w2GD0wn-4/edit?usp=sharing>\
 
 link to dive tool: <https://github.com/wagoodman/dive>\
 be sure to read docker best practices: <https://docs.docker.com/develop/develop-images/dockerfile_best-practices/>\
 useful article: <https://medium.com/@gdiener/how-to-build-a-smaller-docker-image-76779e18d48a>\
 docker articles (python focused, but not all python specific): <https://pythonspeed.com/docker/>\
 docker docs on multistage builds: <https://docs.docker.com/develop/develop-images/multistage-build/>\
+
