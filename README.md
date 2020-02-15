@@ -19,17 +19,21 @@ This repo is meant to accompany a 5 minute talk about keeping docker image sizes
       * [dive image analysis tool](#dive-image-analysis-tool)
       * [final notes and links](#final-notes-and-links)
 
-<!-- Added by: rexroof, at: Sat Feb 15 15:29:06 EST 2020 -->
+<!-- Added by: rexroof, at: Sat Feb 15 15:50:07 EST 2020 -->
 
 <!--te-->
 
 ## How to use this repo
-The working examples in this repo all require docker.  They have been tested on macos but should work as written in linux and windows.  Each folder contains a dockerfile and a build.sh and run.sh script. Run the build.sh script to build the container and then the run.sh script to start the container.  In all cases run.sh can be exited with Control-C. Feel free to reach out if you have any questions.  I'm available on [twitter](https://twitter.com/rexroof) or by emailing [dockerweightloss@rexroof.com](mailto:dockerweightloss@rexroof.com)
+The working examples in this repo all require docker.  They have been tested on MacOS but should work as written in Linux and Windows.  Each folder contains a dockerfile and a build.sh and run.sh script. Run the build.sh script to build the container and then the run.sh script to start the container.  In all cases run.sh can be exited with Control-C. Feel free to reach out if you have any questions.  I'm available on [twitter](https://twitter.com/rexroof) or by emailing [dockerweightloss@rexroof.com](mailto:dockerweightloss@rexroof.com)
 
 ## Docker layers and caching
+The `docker build` command reads a Dockerfile, executing each step in order.  After every step it will create a filesystem layer that it can cache.  A later build of this image will check to see if there is a local cache of this layer available.  Instead of rebuilding the layer, it will just reference the cache.  Cached layers will also affect what layers get pushed up to a registry, and also which layers need to be downloaded from that registry when deploying.  This is why it is always good to minimize the number of layers you need to create.  Or, alternatively, optimize steps in your dockerfile to better use the layer caching to your benefit.  
+
+Most often this means you copy in your package dependencies early in your dockerfile (aka requirements.txt or package.json), then do your installs, and only after install, copy in the rest of your source code.   This will mean you only need to rebuild your packages when your requirements have changed.  Otherwise docker will reference it's prebuilt cache. 
+
 
 ## Group together instructions
-Most of the instructions in a Dockerfile will create a layer in your resulting docker image. If you create files in a layer and remove them later in the dockerfile, you're storing files in your image that you'll never use.  It's wise to group together commands that create and delete files into a single instruction to avoid caching files you'll end up deleting.  One obvious example of this is installing a compiler to build software.  The compiler is only needed to build the software, not to run it. 
+One way to minimize the layers in your dockerfile is to group together instructions.  The best place to do this is any time you are creating files in your container that you will later be deleting.  If you create files in a layer and remove them later in the dockerfile, you're storing files in your image that you'll never use.  One obvious example of this is installing a compiler to build software.  The compiler is only needed to build the software, not to run it. 
 
 ### cmatrix example
 This example downloads and compiles the `cmatrix` command line novelty.  This is a command that prints a matrix-style screensaver to your terminal.   I have written two examples that have drastically different sizes.   **NOTE:** This command might corrupt your terminal.  Running `reset` after exiting the cmatrix will fix it.
