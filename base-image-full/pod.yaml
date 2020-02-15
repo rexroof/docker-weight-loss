@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: smaller-source
+spec:
+  containers:
+  - image: rexroof/docker-weight-loss:base-image-full
+    name: demo
+    ports:
+      - containerPort: 5000
+        name: http
+    livenessProbe:
+      httpGet:
+        path: /healthz
+        port: http
+    resources:
+      limits:
+        memory: "200Mi"
+      requests:
+        memory: "100Mi"
