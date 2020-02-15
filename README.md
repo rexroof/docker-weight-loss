@@ -6,6 +6,7 @@ This repo is meant to accompany a 5 minute talk about keeping docker image sizes
 <!--ts-->
    * [Docker Weight Loss Tips](#docker-weight-loss-tips)
       * [How to use this repo](#how-to-use-this-repo)
+      * [Docker layers and caching](#docker-layers-and-caching)
       * [Group together instructions](#group-together-instructions)
          * [cmatrix example](#cmatrix-example)
          * [python example](#python-example)
@@ -18,12 +19,14 @@ This repo is meant to accompany a 5 minute talk about keeping docker image sizes
       * [dive image analysis tool](#dive-image-analysis-tool)
       * [final notes and links](#final-notes-and-links)
 
-<!-- Added by: rexroof, at: Sat Feb 15 12:29:38 EST 2020 -->
+<!-- Added by: rexroof, at: Sat Feb 15 15:29:06 EST 2020 -->
 
 <!--te-->
 
 ## How to use this repo
 The working examples in this repo all require docker.  They have been tested on macos but should work as written in linux and windows.  Each folder contains a dockerfile and a build.sh and run.sh script. Run the build.sh script to build the container and then the run.sh script to start the container.  In all cases run.sh can be exited with Control-C. Feel free to reach out if you have any questions.  I'm available on [twitter](https://twitter.com/rexroof) or by emailing [dockerweightloss@rexroof.com](mailto:dockerweightloss@rexroof.com)
+
+## Docker layers and caching
 
 ## Group together instructions
 Most of the instructions in a Dockerfile will create a layer in your resulting docker image. If you create files in a layer and remove them later in the dockerfile, you're storing files in your image that you'll never use.  It's wise to group together commands that create and delete files into a single instruction to avoid caching files you'll end up deleting.  One obvious example of this is installing a compiler to build software.  The compiler is only needed to build the software, not to run it. 
@@ -54,23 +57,33 @@ Pre-built images on docker hub often come in many different variants. These diff
 There are two example folders in this repo to demonstrate this:  **base-image-full/** and **base-image-slim/**.  You can use the `build.sh` scripts in each and then compare the resulting sizes with `docker image list`.   Remember that these containers have the same functionality, but with drastically different sizes.   I've also included a kubernetes manifest in each folder that can be used to deploy this container.  In my tests, the reduced image size can make a difference of almost a minute.   And even show speed improvements when the container is already cached locally. 
 
 ## multi-stage builds
+Docker allows you to define multiple docker containers in a single Dockerfile.   Docker will build each of the containers in the file, in order.   By default docker will build up to the last container in the file.  Providing the --target option to docker will make it stop building at an earlier container in the file.  Only the target container's filesystem layers will end up in the resulting docker image.  This allows you to create a development container for use while developing software, and then a later container in the file can copy out the files needed for production, which will result in a much smaller container.
 
 ### golang multistage example
+In the **go-multistage/** folder is a common golang example using multistage builds.  This Dockerfile contains three stages:  first a build stage that compiles the go binary.  Second is an alpine container that takes a copy of the compiled binary with nothing else.  and last is a scratch container with just the compiled binary.   There is a `build_all.sh` script that will build each of these stages into their own tagged image, after running that script you can see the sizes of each of these different containers using `docker image list`.
+
+While building these containers your local docker will cache each of the layers like normal, but when tagging the resulting image it only uses the layers from the final container.  This makes for potentially very small images, though you may lose some of the benefits of those cached layers.  
+
 ### nodejs multistage example
+The **node-multistage** folder contains an example nodejs-react project with a Dockerfile setup that I've used often.   It has a three-stage dockerfile.  The first stage is a development container.  If you target and run it alone, it will run your nodejs project in development mode.   The second container starts with the development container as it's base, and then runs your node build to produce an artifact.   The last container defined is an nginx web server container that only copies your build artifact.   This makes for a very small deployed container.  
+
+This folder contains a `build_dev.sh` and `run_dev.sh` script that will build and run the docker container in development mode.   If you run build_dev and run_dev, it will start the project.  With the project running any edits in the source directory will be hot-loaded on the site.  I suggest you open <http://localhost:3000> in your browser and try editing the html in `src/App.js` on lines 11-13. 
+
+It might also be useful to compare the image sizes between the node-multistage and node-multistage-dev container. 
 
 ## dive image analysis tool
-One useful tool for analyzing wasted space in your docker containers is [dive](https://github.com/wagoodman/dive).  I've included a `dive.sh` script in the top level of this repo.  It will rebuild a docker image and open the dive analysis tool on the newly built image.    You can run it by going into any of the example folders and running `../dive.sh`.  Comparing the cmatrix and cmatrix-compact examples.   Take note of the Image efficiency score and potentially wasted space in each container.   You can also use this tool to browse changes in the filesystem for each layer of your image. 
+One useful tool for analyzing wasted space in your docker containers is [dive](https://github.com/wagoodman/dive).  I've included a `dive.sh` script in the top level of this repo.  It will rebuild a docker image and open the dive analysis tool on the newly built image.    You can run it by going into any of the example folders and running `../dive.sh`.  Compare the dive analysis of the cmatrix and cmatrix-compact examples.   Take note of the Image efficiency score and potentially wasted space in each container.   You can also use this tool to browse changes in the filesystem for each layer of your image. 
 
 
 ## final notes and links
 
-I'm Rex Roof.   I live in Michigan, USA and work on infrastructure at Blue Newt Software. You can find me at most internet places with the name `rexroof`.
+I'm Rex Roof.   I live in Ann Arbor,  Michigan, USA and work on infrastructure at Blue Newt Software. You can find me at most internet places with the name `rexroof`.
 
 Links to slides for when I gave this talk at Devops Days Guadalajara
-<>
+<>\
 
-link to dive tool: <https://github.com/wagoodman/dive>
-be sure to read docker best practices: <https://docs.docker.com/develop/develop-images/dockerfile_best-practices/>
-useful article: <https://medium.com/@gdiener/how-to-build-a-smaller-docker-image-76779e18d48a>
-docker articles (python focused, but not all python specific): <https://pythonspeed.com/docker/>
-docker docs on multistage builds: <https://docs.docker.com/develop/develop-images/multistage-build/>
+link to dive tool: <https://github.com/wagoodman/dive>\
+be sure to read docker best practices: <https://docs.docker.com/develop/develop-images/dockerfile_best-practices/>\
+useful article: <https://medium.com/@gdiener/how-to-build-a-smaller-docker-image-76779e18d48a>\
+docker articles (python focused, but not all python specific): <https://pythonspeed.com/docker/>\
+docker docs on multistage builds: <https://docs.docker.com/develop/develop-images/multistage-build/>\
