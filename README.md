@@ -84,7 +84,11 @@ One useful tool for analyzing wasted space in your docker containers is [dive](h
 I'm Rex Roof.   I live in Ann Arbor,  Michigan, USA and work on infrastructure at Blue Newt Software. You can find me at most internet places with the name `rexroof`.
 
 Links to slides for when I gave this talk at Devops Days Guadalajara
-<https://docs.google.com/presentation/d/1rHhL_tT7umwVMQTod9FOJZWJaIZZn0JUz7w2GD0wn-4/edit?usp=sharing>
+<https://docs.google.com/presentation/d/1rHhL_tT7umwVMQTod9FOJZWJaIZZn0JUz7w2GD0wn-4/edit?usp=sharing>\
+
+A version of the slides in spanish:
+<https://docs.google.com/presentation/d/1XViz5u4i404vLVJ7CE0TVKPq_WP8MaQqVmCtBBftpkM/edit?usp=sharing>
+
 
 link to dive tool: <https://github.com/wagoodman/dive>\
 be sure to read docker best practices: <https://docs.docker.com/develop/develop-images/dockerfile_best-practices/>\
