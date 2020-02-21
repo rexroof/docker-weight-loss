@@ -94,5 +94,6 @@ link to dive tool: <https://github.com/wagoodman/dive>\
 be sure to read docker best practices: <https://docs.docker.com/develop/develop-images/dockerfile_best-practices/>\
 useful article: <https://medium.com/@gdiener/how-to-build-a-smaller-docker-image-76779e18d48a>\
 docker articles (python focused, but not all python specific): <https://pythonspeed.com/docker/>\
-docker docs on multistage builds: <https://docs.docker.com/develop/develop-images/multistage-build/>
+docker docs on multistage builds: <https://docs.docker.com/develop/develop-images/multistage-build/>\
+docker layer analyzer: <https://github.com/orisano/dlayer>
 
